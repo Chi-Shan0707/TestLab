@@ -271,7 +271,12 @@ void test8(int x) {
 void progress_bar(int init){
   int progress = init;
   while(1){
-    // TODO: Implement an animation of progress bar
+    int width = 50;
+    int filled = progress < 0 ? 0 : progress > 64 ? width : progress * width / 64;
+    printf("\r[");
+    for (int i = 0; i < width; i++)
+      putchar(i < filled ? '#' : ' ');
+    printf("] %3d/64", progress);
     
     fflush(stdout);
     progress = yield(progress);
@@ -296,16 +301,15 @@ void test_progress_bar(int x){
 }
 
 int main(){
-    //TODO: only enable tests THAT YOU CAN PASS
-    //test1(1);
-    //test2(NULL, 0);
-    //test3(0);
-    //test4(0);
-    //test5();
-    //test6(0);
-    //test7(0);
-    //test8(0);
-    //test_progress_bar(0);
+    test1(1);
+    test2(NULL, 0);
+    test3(0);
+    test4(0);
+    test5();
+    test6(0);
+    test7(0);
+    test8(0);
+    test_progress_bar(0);
     {
       try{
       }

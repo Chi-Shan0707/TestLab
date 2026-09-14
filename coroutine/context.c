@@ -11,15 +11,21 @@ __generator* __now_gen = &__main_gen;
 void __err_stk_push(__ctx* ctx){
     assert(ctx != 0);
 
-    // TODO
-    
+    __err_stk_node* node = (__err_stk_node*) malloc(sizeof(*node));
+    assert(node != 0);
+    node->ctx = ctx;
+    node->prev = __now_gen->__err_stk_head;
+    __now_gen->__err_stk_head = node;
 }
 
 __ctx* __err_stk_pop(){
     assert(__now_gen->__err_stk_head != 0);
 
-    // TODO
-    
+    __err_stk_node* node = __now_gen->__err_stk_head;
+    __ctx* ctx = node->ctx;
+    __now_gen->__err_stk_head = node->prev;
+    free(node);
+    return ctx;
 }
 
 void __err_cleanup(const int* error){
@@ -67,22 +73,13 @@ __generator* generator(void (*f)(int), int arg) {
     new_gen->__err_stk_head = NULL;
     long long* ctx_addr = (void*)&new_gen->ctx;
     long long* stack_addr = (void*)new_gen->stack;
-    // TODO: Construct a new generator's context
-
-    // Things you may do:
-    // 1. Set stack pointer $rsp
-    // 2. Set return position on the stack top or in context
-    // 3. Set argument $rsi
-    // 4. Set stack base pointer $rbp (optional)
-    // 5. Set the function f into context (optional)
-    // 6. Set other registers if needed
-
-    // Example: (It depends on your own context structure)
-    // ctx_addr[0] = (long long)((char*)new_gen->stack + size - 16); //stack pointer
-    // ctx_addr[5] = arg; //rsi
-    // ctx_addr[6] = (long long)((char*)gen->stack + size); //rbp
-    // ctx_addr[1] = (long long)((void*)back_to_reality); //return position in context 
-    // stack_addr[size / 8 - 1] = (void *)back_to_reality; //or return position on stack
+    ctx_addr[6] = (long long)(stack_addr + size / sizeof(long long) - 1);
+    ctx_addr[7] = (long long)(void*)f;
+    ctx_addr[8] = arg;
+    stack_addr[size / sizeof(long long) - 1] =
+        (long long)(void*)back_to_reality;
+    new_gen->caller = NULL;
+    new_gen->data = 0;
 
     return new_gen;
 }
